@@ -41,7 +41,7 @@ def main() -> None:
             break
         else:
             print("Konflikt erkannt, Cut wird erzeugt...")
-            new_cut = generate_cut(master_solution["x"].keys())
+            new_cut = generate_cut(master_solution["x"])
             cuts.append(new_cut)
             iteration += 1
 
