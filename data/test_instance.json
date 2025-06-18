@@ -1,0 +1,28 @@
+import json
+
+# Nach Kernel-Reset: Beispielinstanz erneut erzeugen
+multi_path_instance = {
+    "trains": [0, 1],
+    "paths": {
+        "0": [[0, 1], [0, 2]],
+        "1": [[3, 4], [3, 5]]
+    },
+    "durations": {
+        "(0, 0)": 3,
+        "(0, 1)": 2,
+        "(0, 2)": 2,
+        "(1, 3)": 3,
+        "(1, 4)": 2,
+        "(1, 5)": 2
+    },
+    "conflicts": [
+        [0, 1, 1, 4],
+        [0, 2, 1, 5]
+    ]
+}
+
+file_path = "/mnt/data/multi_path_instance.json"
+with open(file_path, "w") as f:
+    json.dump(multi_path_instance, f, indent=2)
+
+file_path
