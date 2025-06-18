@@ -70,6 +70,29 @@ def check_feasibility(data, solution):
     if result.r == 1:
         model = solver.model()
         x_vals_result = {key: float(model[S[key]].as_decimal(5).replace("?", "")) for key in S}
-        return True, 0.0, x_vals_result
+
+        # Calculate objective value based on instance specification
+        objective = 0.0
+        for comp in data.get("objective", []):
+            if comp.get("type") != "op_delay":
+                continue
+
+            train = comp["train"]
+            op = comp["operation"]
+
+            if (train, op) not in x_vals_result:
+                # Operation not part of the chosen paths
+                continue
+
+            t = x_vals_result[(train, op)]
+            threshold = comp.get("threshold", 0)
+            increment = comp.get("increment", 0)
+            coeff = comp.get("coeff", 0)
+
+            delay = max(0.0, t - threshold)
+            step = 1 if t >= threshold else 0
+            objective += coeff * delay + increment * step
+
+        return True, objective, x_vals_result
     else:
         return False, None, None
