@@ -8,6 +8,7 @@ def solve_master(data, cuts):
     trains = data["trains"]
     paths = data["paths"]  # dict: train_id -> list of paths
     conflicts = data["conflicts"]  # list of (train1, op1, train2, op2)
+    no_swaps = data.get("no_swaps", [])
 
     # Variablen: Pfadwahl z_{tp}
     z = {}
@@ -19,6 +20,11 @@ def solve_master(data, cuts):
     x = {}
     for (t1, o1, t2, o2) in conflicts:
         x[(t1, o1, t2, o2)] = model.addVar(vtype=GRB.BINARY, name=f"x_{t1}_{o1}_{t2}_{o2}")
+
+    # Consistent ordering on shared resource sequences
+    for pair1, pair2 in no_swaps:
+        if pair1 in x and pair2 in x:
+            model.addConstr(x[pair1] == x[pair2], name=f"noswap_{pair1}_{pair2}")
 
     # Pfadwahl: genau ein Pfad je Zug
     for t in paths:

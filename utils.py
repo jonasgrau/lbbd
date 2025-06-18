@@ -41,5 +41,6 @@ def instance_to_data(instance: DisplibInstance) -> dict:
             for train in instance.trains for op in train.operations
         },
         "conflicts": instance.get_conflicts(),
+        "no_swaps": instance.get_no_swap_pairs(),
         "objective": instance.objectives,
     }

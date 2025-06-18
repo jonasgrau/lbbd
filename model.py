@@ -59,3 +59,29 @@ class DisplibInstance:
 
     def generate_paths_dict(self):
         return {str(train.train_id): train.generate_paths() for train in self.trains}
+
+    def get_no_swap_pairs(self):
+        """Return pairs of conflicts enforcing consistent order across resources."""
+        train_res = {}
+        for train in self.trains:
+            m = {}
+            for op in train.operations:
+                for r in op.resources:
+                    m.setdefault(r["resource"], op.op_id)
+            train_res[train.train_id] = m
+
+        pairs = []
+        trains = list(train_res.keys())
+        for i in range(len(trains)):
+            for j in range(i + 1, len(trains)):
+                t1, t2 = trains[i], trains[j]
+                m1, m2 = train_res[t1], train_res[t2]
+                shared = list(set(m1.keys()) & set(m2.keys()))
+                for a in range(len(shared)):
+                    for b in range(a + 1, len(shared)):
+                        rA, rB = shared[a], shared[b]
+                        o1A, o1B = m1[rA], m1[rB]
+                        o2A, o2B = m2[rA], m2[rB]
+                        if (o1A < o1B and o2A > o2B) or (o1A > o1B and o2A < o2B):
+                            pairs.append(((t1, o1A, t2, o2A), (t1, o1B, t2, o2B)))
+        return pairs
