@@ -38,5 +38,6 @@ def solve_master(data, cuts):
     model.optimize()
 
     z_sol = {k: v.X for k, v in z.items() if v.X > 0.5}
-    x_sol = {k: v.X for k, v in x.items() if v.X > 0.5}
+    # Return all ordering decisions so the subproblem can enforce them
+    x_sol = {k: int(round(v.X)) for k, v in x.items()}
     return {"z": z_sol, "x": x_sol}
