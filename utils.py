@@ -23,14 +23,4 @@ def parse_displib_instance(path):
 
     objectives = raw.get("objective", [])
     instance = DisplibInstance(trains=trains, objectives=objectives)
-    result = {
-        "trains": list(range(len(trains))),
-        "paths": instance.generate_paths_dict(),
-        "durations": {
-            str((op.train_id, op.op_id)): op.min_duration
-            for train in instance.trains for op in train.operations
-        },
-        "conflicts": instance.get_conflicts(),
-        "objective": objectives
-    }
-    return result
+    return instance

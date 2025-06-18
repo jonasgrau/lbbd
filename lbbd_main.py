@@ -8,7 +8,7 @@ from utils import parse_displib_instance
 import os
 
 # Lade Instanz
-instance = parse_displib_instance("/Users/jonas/Opti Lab/LBBD/data/displib_testinstances_headway1.json")
+instance = parse_displib_instance("data/displib_testinstances_headway1.json")
 data = {
     "trains": list(range(len(instance.trains))),
     "train_objects": instance.trains,
