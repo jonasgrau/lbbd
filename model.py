@@ -76,7 +76,8 @@ class DisplibInstance:
             for j in range(i + 1, len(trains)):
                 t1, t2 = trains[i], trains[j]
                 m1, m2 = train_res[t1], train_res[t2]
-                shared = list(set(m1.keys()) & set(m2.keys()))
+                # Sort shared resources to make pair generation deterministic
+                shared = sorted(set(m1.keys()) & set(m2.keys()))
                 for a in range(len(shared)):
                     for b in range(a + 1, len(shared)):
                         rA, rB = shared[a], shared[b]
@@ -84,4 +85,6 @@ class DisplibInstance:
                         o2A, o2B = m2[rA], m2[rB]
                         if (o1A < o1B and o2A > o2B) or (o1A > o1B and o2A < o2B):
                             pairs.append(((t1, o1A, t2, o2A), (t1, o1B, t2, o2B)))
+        # Ensure stable output order for unit tests
+        pairs.sort()
         return pairs
