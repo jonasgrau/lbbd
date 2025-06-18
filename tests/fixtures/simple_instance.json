@@ -1,0 +1,13 @@
+{
+  "trains": [
+    [
+      {"min_duration": 1, "successors": [1]},
+      {"min_duration": 2, "resources": [{"resource": "r0"}], "successors": []}
+    ],
+    [
+      {"min_duration": 1, "successors": [1]},
+      {"min_duration": 2, "resources": [{"resource": "r0"}], "successors": []}
+    ]
+  ],
+  "objective": []
+}
