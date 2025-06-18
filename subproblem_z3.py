@@ -19,6 +19,12 @@ def check_feasibility(data, solution):
             W[key] = Real(f"W_{t}_{o}")
             solver.add(W[key] >= 0)
 
+            op_data = trains[t].operations[o]
+            lb = op_data.start_lb if op_data.start_lb is not None else 0
+            solver.add(S[key] >= lb)
+            if op_data.start_ub is not None:
+                solver.add(S[key] <= op_data.start_ub)
+
     for (t, p_id), val in solution["z"].items():
         path = paths[str(t)][p_id]
         for i in range(len(path)):
