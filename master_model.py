@@ -37,6 +37,7 @@ def solve_master(data, cuts):
     model.setObjective(0, GRB.MINIMIZE)  # Dummy-Ziel
     model.optimize()
 
-    z_sol = {k: v.X for k, v in z.items() if v.X > 0.5}
-    x_sol = {k: v.X for k, v in x.items() if v.X > 0.5}
+    # Export only chosen paths but keep all ordering decisions
+    z_sol = {k: int(round(v.X)) for k, v in z.items() if v.X > 0.5}
+    x_sol = {k: int(round(v.X)) for k, v in x.items()}
     return {"z": z_sol, "x": x_sol}
