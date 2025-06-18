@@ -61,10 +61,30 @@ def check_feasibility(data, solution):
                             if r2["resource"] == rname:
                                 key2 = (t2, o2)
                                 release_key2, rel2 = R_rel.get((t2, o2, rname), (key2, 0))
-                                solver.add(
-                                    (S[release_key1] + rel1 <= S[key2]) 
-                                    | (S[release_key2] + rel2 <= S[(t1, o1)])
-                                )
+                                # Respect ordering decisions from the master problem
+                                pair = (t1, o1, t2, o2)
+                                if (t2, o2) < (t1, o1):
+                                    pair = (t2, o2, t1, o1)
+                                    invert = True
+                                else:
+                                    invert = False
+
+                                order = solution.get("x", {}).get(pair)
+
+                                if order is None:
+                                    # No fixed order -> non-overlap disjunction
+                                    solver.add(
+                                        (S[release_key1] + rel1 <= S[key2])
+                                        | (S[release_key2] + rel2 <= S[(t1, o1)])
+                                    )
+                                else:
+                                    if invert:
+                                        order = 1 - order
+
+                                    if order == 1:
+                                        solver.add(S[release_key1] + rel1 <= S[key2])
+                                    else:
+                                        solver.add(S[release_key2] + rel2 <= S[(t1, o1)])
 
     result = solver.check()
     if result.r == 1:
