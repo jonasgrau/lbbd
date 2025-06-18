@@ -71,6 +71,8 @@ class DisplibInstance:
             train_res[train.train_id] = m
 
         pairs = []
+        # Gather conflicts for quick lookup
+        conflicts = set(self.get_conflicts())
         trains = list(train_res.keys())
         for i in range(len(trains)):
             for j in range(i + 1, len(trains)):
@@ -85,6 +87,33 @@ class DisplibInstance:
                         o2A, o2B = m2[rA], m2[rB]
                         if (o1A < o1B and o2A > o2B) or (o1A > o1B and o2A < o2B):
                             pairs.append(((t1, o1A, t2, o2A), (t1, o1B, t2, o2B)))
+
+        # Also link orderings in simple three-train cycles
+        for i in range(len(trains)):
+            for j in range(i + 1, len(trains)):
+                for k in range(j + 1, len(trains)):
+                    t1, t2, t3 = trains[i], trains[j], trains[k]
+                    m1, m2, m3 = train_res[t1], train_res[t2], train_res[t3]
+
+                    shared12 = set(m1.keys()) & set(m2.keys())
+                    shared23 = set(m2.keys()) & set(m3.keys())
+                    shared13 = set(m1.keys()) & set(m3.keys())
+
+                    if len(shared12) == 1 and len(shared23) == 1 and len(shared13) == 1:
+                        r12 = next(iter(shared12))
+                        r23 = next(iter(shared23))
+                        r13 = next(iter(shared13))
+
+                        def pair(tA, oA, tB, oB):
+                            return (tA, oA, tB, oB) if tA < tB else (tB, oB, tA, oA)
+
+                        p12 = pair(t1, m1[r12], t2, m2[r12])
+                        p23 = pair(t2, m2[r23], t3, m3[r23])
+                        p13 = pair(t1, m1[r13], t3, m3[r13])
+
+                        for a, b in ((p12, p23), (p23, p13), (p13, p12)):
+                            if a in conflicts and b in conflicts:
+                                pairs.append((a, b))
         # Ensure stable output order for unit tests
         pairs.sort()
         return pairs
